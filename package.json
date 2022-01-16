@@ -15,8 +15,16 @@
   "engines": {
     "node": ">= 14.x"
   },
+  "lint-staged": {
+    "./src/**/*.{ts,js,jsx,tsx}": [
+      "pnpm lint --fix",
+      "pnpm format"
+    ]
+  },
   "prettier": "@geist-ui/prettier-config",
   "devDependencies": {
+    "@commitlint/cli": "^16.0.2",
+    "@commitlint/config-conventional": "^16.0.0",
     "@geist-ui/prettier-config": "^1.0.1",
     "@types/jest": "^25.2.2",
     "@types/koa": "^2.13.4",
@@ -28,7 +36,9 @@
     "esbuild-node-externals": "^1.4.1",
     "eslint": "^8.7.0",
     "eslint-config-alloy": "^4.4.0",
+    "husky": "^7.0.4",
     "jest": "^26.6.3",
+    "lint-staged": "^12.1.7",
     "prettier": "^2.5.1",
     "prisma": "^3.8.1",
     "supertest": "^4.0.2",

@@ -27,4 +27,19 @@ export class UserService {
       },
     })
   }
+
+  async getInfo(findInfo: Prisma.UserWhereUniqueInput) {
+    return prisma.user.findUnique({
+      where: {
+        username: findInfo.username,
+      },
+    })
+  }
+
+  async update(updateInfo: Prisma.UserUpdateArgs) {
+    return prisma.user.update({
+      where: updateInfo.where,
+      data: updateInfo.data,
+    })
+  }
 }

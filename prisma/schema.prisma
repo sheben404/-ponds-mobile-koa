@@ -12,3 +12,10 @@ model Session {
   name String
   createdAt DateTime @default(now())
 }
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username String
+  nickname String
+  createdAt DateTime @default(now())
+}

@@ -6,9 +6,14 @@
 
 2. Install dependencies: `pnpm install`
 
-3. Rename `.env.example` to `.env`, and run `pnpm prisma generate` to synchronize the data model
+3. 在根目录下创建 `.env` 文件,文件内容示例：
 
-4. Start the server: `pnpm dev`. visit: http://127.0.0.1:3001/apis/sessions
+```
+ENV=development
+DATABASE_URL='mysql://root:root@localhost:3306/ponds'
+```
+4. 运行`pnpm prisma migrate dev --name init`，在本地启动的 mysql 服务中，按照 '/prisma/schema.prisma' 文件中的 Model 创建表，再运行 `pnpm prisma generate`
+5. 运行: `pnpm dev`.
 
 > 如果是 mac、可能需要将 package.json 中的 dev 命令改为：`export NODE_ENV=development; ts-node-dev -r tsconfig-paths/register app.ts`
 

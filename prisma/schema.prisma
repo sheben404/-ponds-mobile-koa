@@ -7,15 +7,9 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Session {
-  id        Int      @id @default(autoincrement())
-  name String
-  createdAt DateTime @default(now())
-}
-
 model User {
   id        Int      @id @default(autoincrement())
-  mobile String @unique
+  phone String @unique
   username String @unique
   password String
   nickname String

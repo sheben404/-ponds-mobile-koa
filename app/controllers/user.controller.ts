@@ -5,10 +5,13 @@ import {
   BodyParam,
   Get,
   Put,
+  HeaderParam,
 } from 'routing-controllers'
 import { UserService } from '../services'
 import { Prisma } from '@prisma/client'
 import { Service } from 'typedi'
+import ResModel from '../helpers/resModel'
+import { decodeToken, genToken } from '../helpers/jwt'
 
 @JsonController()
 @Service()
@@ -20,56 +23,64 @@ export class UserController {
     @BodyParam('username') username: string,
     @BodyParam('nickname') nickname: string,
     @BodyParam('password') password: string,
-    @BodyParam('mobile') mobile: string,
-  ): Promise<Prisma.UserGetPayload<any>> {
-    return await this.userService.register({
-      mobile,
+    @BodyParam('phone') phone: string,
+  ) {
+    const registerRes = await this.userService.register({
+      phone,
       username,
       nickname,
       password,
     })
+    if (registerRes.id) {
+      const token = genToken({ userId: registerRes.id })
+      return new ResModel(200, '注册成功', Object.assign(registerRes, { token: token }))
+    }
   }
 
   @Post('/user/login')
   async login(
     @BodyParam('username') username: string,
     @BodyParam('password') password: string,
-  ): Promise<Prisma.UserGetPayload<any>> {
-    if (!username) {
-      throw new BadRequestError('username is required')
-    }
-    if (!password) {
-      throw new BadRequestError('username is required')
-    }
-    return await this.userService.login({
+  ) {
+    const loginRes = await this.userService.login({
       username,
       password,
     })
+    if (loginRes.id) {
+      const token = genToken({ userId: loginRes.id })
+      return new ResModel(200, '登录成功', Object.assign(loginRes, { token: token }))
+    }
   }
 
   @Get('/user')
-  async getInfo(
-    @BodyParam('username') username: string
-  ): Promise<Prisma.UserGetPayload<any>> {
-    return await this.userService.getInfo({username})
+  async getInfo(@HeaderParam('Authorization') Authorization: string) {
+    const tokenData = decodeToken(Authorization).data
+    const getInfoRes = await this.userService.getInfoById(tokenData)
+    if (getInfoRes.id) {
+      return new ResModel(200, '获取用户信息成功', getInfoRes)
+    }
   }
 
   @Put('/user')
   async update(
-    @BodyParam('username') username: string,
+    @HeaderParam('Authorization') Authorization: string,
     @BodyParam('nickname') nickname: string,
     @BodyParam('password') password: string,
-    @BodyParam('mobile') mobile: string,
-  ): Promise<Prisma.UserGetPayload<any>> {
-    return await this.userService.update({
+    @BodyParam('phone') phone: string,
+  ) {
+    const tokenData = decodeToken(Authorization).data
+    const updateInfoRes = await this.userService.updateInfo({
       where: {
-        username,
+        id: tokenData.userId,
       },
       data: {
         nickname,
         password,
-        mobile
-      }
+        phone,
+      },
     })
+    if (updateInfoRes.id) {
+      return new ResModel(200, '修改用户信息成功', updateInfoRes)
+    }
   }
 }

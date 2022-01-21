@@ -28,15 +28,15 @@ export class UserService {
     })
   }
 
-  async getInfo(findInfo: Prisma.UserWhereUniqueInput) {
+  async getInfoById(data) {
     return prisma.user.findUnique({
       where: {
-        username: findInfo.username,
+        id: data.userId,
       },
     })
   }
 
-  async update(updateInfo: Prisma.UserUpdateArgs) {
+  async updateInfo(updateInfo: Prisma.UserUpdateArgs) {
     return prisma.user.update({
       where: updateInfo.where,
       data: updateInfo.data,

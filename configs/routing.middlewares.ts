@@ -16,3 +16,18 @@ export class HeaderMiddleware implements KoaMiddlewareInterface {
     return next()
   }
 }
+
+@Middleware({ type: 'before' })
+@Service()
+export class ErrorHandlerMiddleware implements KoaMiddlewareInterface {
+  async use(ctx: any, next: (err?: any) => any) {
+    return next().catch(err => {
+      const ret = {
+        code: 1,
+        status: err.httpCode,
+        message: err.message
+      }
+      ctx.res.end(JSON.stringify(ret))
+    })
+  }
+}

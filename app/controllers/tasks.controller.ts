@@ -1,29 +1,30 @@
 import { Prisma } from '@prisma/client'
-import { BadRequestError, Body, Delete, Get, HeaderParam, JsonController, Param, Post, Put } from 'routing-controllers'
+import { BadRequestError, Body, Ctx, Delete, Get, JsonController, Param, Post, Put, UseBefore } from 'routing-controllers'
 import { Service } from 'typedi'
-import { decodeToken } from '../helpers/jwt'
+import { AuthHeaderMiddleware } from '../helpers/authHeader'
 import { TaskService } from '../services'
 
-@JsonController()
+@JsonController('/task')
 @Service()
+@UseBefore(AuthHeaderMiddleware)
 export class TaskController {
   constructor(private taskService: TaskService) {}
 
-  @Get('/task')
-  async query(@HeaderParam('Authorization') Authorization: string) {
-    const { userId } = decodeToken(Authorization).data
+  @Get()
+  async query(@Ctx() ctx: any) {
+    const { userId } = ctx
     const data = await this.taskService.findById(userId)
     return {
       data
     }
   }
 
-  @Post('/task')
+  @Post()
   async create(
-    @HeaderParam('Authorization') Authorization: string,
+    @Ctx() ctx: any,
     @Body() task: Prisma.TaskCreateInput,
   ): Promise<Prisma.TaskGetPayload<any>> {
-    const { userId } = decodeToken(Authorization).data
+    const { userId } = ctx
     const { title, pond, description, urgency, importance } = task
     if (!title) {
       throw new BadRequestError('title is required')
@@ -46,10 +47,9 @@ export class TaskController {
     return await this.taskService.create(data)
   }
 
-  @Delete('/task/:id/')
-  async deleteTask(@HeaderParam('Authorization') Authorization: string, @Param('id') id: string) {
-    const { userId } = decodeToken(Authorization).data
-    console.log(userId, id);
+  @Delete('/:id/')
+  async deleteTask(@Ctx() ctx: any, @Param('id') id: string) {
+    const { userId } = ctx
     const result = await this.taskService.deleteById(userId, +id.slice(1))
     return {
       msg: "删除任务成功",
@@ -57,9 +57,9 @@ export class TaskController {
     }
   }
 
-  @Put('/task/:id/')
-  async editTask(@HeaderParam('Authorization') Authorization: string, @Body() task: Prisma.TaskCreateInput, @Param('id') id: string) {
-    const { userId } = decodeToken(Authorization).data
+  @Put('/:id/')
+  async editTask(@Body() task: Prisma.TaskCreateInput, @Param('id') id: string) {
+    // const { userId } = ctx
     const { pond, urgency, importance } = task
     if (pond) {
       task.pond = +pond

@@ -9,7 +9,9 @@
     "prettier": "prettier --write '**/*.{js,ts}'",
     "test": "jest --config .jest.config.js --no-cache --detectOpenHandles",
     "prod:build": "node ./build.js",
-    "prod:start": "prisma generate && prisma migrate deploy && export NODE_ENV=production; node ./dist/index.js"
+    "prod:start": "prisma generate && prisma migrate deploy && export NODE_ENV=production; node ./dist/index.js",
+    "generate": "pnpx prisma generate",
+    "push": "pnpx prisma db push"
   },
   "repository": "git@github.com:unix/koa-ts.git",
   "engines": {

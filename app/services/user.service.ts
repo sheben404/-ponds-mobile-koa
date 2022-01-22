@@ -70,4 +70,12 @@ export class UserService {
       },
     })
   }
+
+  async deleteById(id) {
+    return prisma.user.delete({
+      where: {
+        id
+      }
+    })
+  }
 }

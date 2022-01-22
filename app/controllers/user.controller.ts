@@ -83,4 +83,12 @@ export class UserController {
       return new ResModel(200, '修改用户信息成功', updateInfoRes)
     }
   }
+
+  // 测试使用
+  @Post('/user/test/delete')
+  async delete(@HeaderParam('Authorization') Authorization: string) {
+    const tokenData = decodeToken(Authorization).data
+    const deleteRes = await this.userService.deleteById(tokenData.userId)
+    return new ResModel(200, '删除用户成功', deleteRes)
+  }
 }

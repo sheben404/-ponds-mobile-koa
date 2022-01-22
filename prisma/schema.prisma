@@ -16,10 +16,12 @@ model User {
   avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  // Task      Task[]
 }
 
 model Task {
   id          Int       @id @default(autoincrement())
+  // user        User      @relation(fields: [userId], references: [id])
   userId      Int
   title       String
   pond        Int       @default(1)
@@ -28,5 +30,8 @@ model Task {
   urgency     Int?      @default(0)
   startDate   DateTime?
   endDate     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
   // sort        Int
 }

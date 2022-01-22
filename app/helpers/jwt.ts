@@ -3,11 +3,19 @@ import jwt from 'jsonwebtoken'
 const SECRET_KEY = 'pondsTokenSecretKey'
 const EXPIRS_TIME = 60 * 60 * 24 // 24h
 
-export const genToken = data => {
+interface TokenData {
+  userId: number
+}
+
+interface DecodeToken {
+  data: TokenData
+}
+
+export const genToken = (data: TokenData) => {
   return jwt.sign({ data }, SECRET_KEY, { expiresIn: EXPIRS_TIME })
 }
 
-export const decodeToken = Authorization => {
+export const decodeToken: (Authorization) => DecodeToken = Authorization => {
   try {
     // Authorization 格式为 Bearer <token>
     const token = Authorization.split(' ')[1]

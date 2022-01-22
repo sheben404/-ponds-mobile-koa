@@ -55,7 +55,7 @@ export class UserController {
   @Get('/user')
   async getInfo(@HeaderParam('Authorization') Authorization: string) {
     const tokenData = decodeToken(Authorization).data
-    const getInfoRes = await this.userService.getInfoById(tokenData)
+    const getInfoRes = await this.userService.getInfoById(tokenData.userId)
     if (getInfoRes.id) {
       return new ResModel(200, '获取用户信息成功', getInfoRes)
     }

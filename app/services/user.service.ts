@@ -16,6 +16,13 @@ export class UserService {
   async register(userInfo: Prisma.UserCreateInput) {
     return prisma.user.create({
       data: userInfo,
+      select: {
+        id: true,
+        username: true,
+        nickname: true,
+        phone: true,
+        createdAt: true,
+      },
     })
   }
 
@@ -25,13 +32,27 @@ export class UserService {
         username: loginInfo.username,
         password: loginInfo.password,
       },
+      select: {
+        id: true,
+        username: true,
+        nickname: true,
+        phone: true,
+        createdAt: true,
+      },
     })
   }
 
-  async getInfoById(data) {
+  async getInfoById(id) {
     return prisma.user.findUnique({
       where: {
-        id: data.userId,
+        id,
+      },
+      select: {
+        id: true,
+        username: true,
+        nickname: true,
+        phone: true,
+        createdAt: true,
       },
     })
   }
@@ -40,6 +61,13 @@ export class UserService {
     return prisma.user.update({
       where: updateInfo.where,
       data: updateInfo.data,
+      select: {
+        id: true,
+        username: true,
+        nickname: true,
+        phone: true,
+        createdAt: true,
+      },
     })
   }
 }

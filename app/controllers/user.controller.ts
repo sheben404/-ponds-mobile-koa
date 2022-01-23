@@ -2,93 +2,110 @@ import {
   BadRequestError,
   Post,
   JsonController,
-  BodyParam,
   Get,
   Put,
-  HeaderParam,
+  Body,
+  UseBefore,
+  Ctx,
 } from 'routing-controllers'
 import { UserService } from '../services'
 import { Prisma } from '@prisma/client'
 import { Service } from 'typedi'
-import ResModel from '../helpers/resModel'
-import { decodeToken, genToken } from '../helpers/jwt'
+import { genToken } from '../helpers/jwt'
+import { AuthHeaderMiddleware } from '../helpers/authHeader'
 
-@JsonController()
+@JsonController('/user')
 @Service()
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Post('/user/register')
-  async register(
-    @BodyParam('username') username: string,
-    @BodyParam('nickname') nickname: string,
-    @BodyParam('password') password: string,
-    @BodyParam('phone') phone: string,
-  ) {
+  @Post('/register')
+  async register(@Body() registerParmObj: Prisma.UserCreateInput & { smsCode: String }) {
+    const { phone, username, nickname, password, smsCode } = registerParmObj
+    const registerParmArr = ['phone', 'username', 'nickname', 'password', 'smsCode']
+    registerParmArr.forEach(item => {
+      if (!registerParmObj[item]) {
+        throw new BadRequestError(`${item} is required`)
+      }
+    })
     const registerRes = await this.userService.register({
       phone,
       username,
       nickname,
       password,
     })
-    if (registerRes.id) {
+    if (registerRes) {
       const token = genToken({ userId: registerRes.id })
-      return new ResModel(200, '注册成功', Object.assign(registerRes, { token: token }))
+      return { msg: '注册成功', data: Object.assign(registerRes, { token: token }) }
+    } else {
+      throw new BadRequestError('注册失败')
     }
   }
 
-  @Post('/user/login')
-  async login(
-    @BodyParam('username') username: string,
-    @BodyParam('password') password: string,
-  ) {
+  @Post('/login')
+  async login(@Body() loginParmObj: { username: string; password: string }) {
+    const { username, password } = loginParmObj
+    const loginParmArr = ['username', 'password']
+    loginParmArr.forEach(item => {
+      if (!loginParmObj[item]) {
+        throw new BadRequestError(`${item} is required`)
+      }
+    })
     const loginRes = await this.userService.login({
       username,
       password,
     })
-    if (loginRes.id) {
+    if (loginRes) {
       const token = genToken({ userId: loginRes.id })
-      return new ResModel(200, '登录成功', Object.assign(loginRes, { token: token }))
+      return { msg: '登录成功', data: Object.assign(loginRes, { token: token }) }
+    } else {
+      throw new BadRequestError('用户名密码不匹配')
     }
   }
 
-  @Get('/user')
-  async getInfo(@HeaderParam('Authorization') Authorization: string) {
-    const tokenData = decodeToken(Authorization).data
-    const getInfoRes = await this.userService.getInfoById(tokenData.userId)
-    if (getInfoRes.id) {
-      return new ResModel(200, '获取用户信息成功', getInfoRes)
+  @Get()
+  @UseBefore(AuthHeaderMiddleware)
+  async getInfo(@Ctx() ctx: any) {
+    const { userId } = ctx
+    const getInfoRes = await this.userService.getInfoById(userId)
+    if (getInfoRes) {
+      return { msg: '获取用户信息成功', data: getInfoRes }
     }
   }
 
-  @Put('/user')
+  @Put()
+  @UseBefore(AuthHeaderMiddleware)
   async update(
-    @HeaderParam('Authorization') Authorization: string,
-    @BodyParam('nickname') nickname: string,
-    @BodyParam('password') password: string,
-    @BodyParam('phone') phone: string,
+    @Ctx() ctx: any,
+    @Body()
+    updateParmObj: Omit<Prisma.UserUpdateInput, 'username' | 'createAt' | 'updateAt'>,
   ) {
-    const tokenData = decodeToken(Authorization).data
+    const { userId } = ctx
+    const { nickname, password, phone, avatar } = updateParmObj
     const updateInfoRes = await this.userService.updateInfo({
       where: {
-        id: tokenData.userId,
+        id: userId,
       },
       data: {
         nickname,
         password,
         phone,
+        avatar,
       },
     })
-    if (updateInfoRes.id) {
-      return new ResModel(200, '修改用户信息成功', updateInfoRes)
+    if (updateInfoRes) {
+      return { msg: '修改用户信息成功', data: updateInfoRes }
+    } else {
+      throw new BadRequestError('修改用户信息失败')
     }
   }
 
   // 测试使用
-  @Post('/user/test/delete')
-  async delete(@HeaderParam('Authorization') Authorization: string) {
-    const tokenData = decodeToken(Authorization).data
-    const deleteRes = await this.userService.deleteById(tokenData.userId)
-    return new ResModel(200, '删除用户成功', deleteRes)
+  @UseBefore(AuthHeaderMiddleware)
+  @Post('/test/delete')
+  async delete(@Ctx() ctx: any) {
+    const { userId } = ctx
+    const deleteRes = await this.userService.deleteById(userId)
+    return { msg: '删除用户成功', data: deleteRes }
   }
 }

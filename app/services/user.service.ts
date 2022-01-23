@@ -13,16 +13,18 @@ export class UserService {
    *
    * About CRUD: https://www.prisma.io/docs/concepts/components/prisma-client/crud
    */
+  userSelect = {
+    id: true,
+    username: true,
+    nickname: true,
+    phone: true,
+    createdAt: true,
+  }
+  
   async register(userInfo: Prisma.UserCreateInput) {
     return prisma.user.create({
       data: userInfo,
-      select: {
-        id: true,
-        username: true,
-        nickname: true,
-        phone: true,
-        createdAt: true,
-      },
+      select: this.userSelect,
     })
   }
 
@@ -32,13 +34,7 @@ export class UserService {
         username: loginInfo.username,
         password: loginInfo.password,
       },
-      select: {
-        id: true,
-        username: true,
-        nickname: true,
-        phone: true,
-        createdAt: true,
-      },
+      select: this.userSelect,
     })
   }
 
@@ -47,13 +43,7 @@ export class UserService {
       where: {
         id,
       },
-      select: {
-        id: true,
-        username: true,
-        nickname: true,
-        phone: true,
-        createdAt: true,
-      },
+      select: this.userSelect,
     })
   }
 
@@ -61,21 +51,15 @@ export class UserService {
     return prisma.user.update({
       where: updateInfo.where,
       data: updateInfo.data,
-      select: {
-        id: true,
-        username: true,
-        nickname: true,
-        phone: true,
-        createdAt: true,
-      },
+      select: this.userSelect,
     })
   }
 
   async deleteById(id) {
     return prisma.user.delete({
       where: {
-        id
-      }
+        id,
+      },
     })
   }
 }

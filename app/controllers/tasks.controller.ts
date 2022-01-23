@@ -23,7 +23,7 @@ export class TaskController {
   async create(
     @Ctx() ctx: any,
     @Body() task: Prisma.TaskCreateInput,
-  ): Promise<Prisma.TaskGetPayload<any>> {
+  ) {
     const { userId } = ctx
     const { title, pond, description, urgency, importance } = task
     if (!title) {
@@ -44,13 +44,27 @@ export class TaskController {
       ...task,
       userId
     }
-    return await this.taskService.create(data)
+    const result = await this.taskService.create(data)
+    return {
+      msg: "添加成功",
+      data: result
+    }
   }
 
   @Delete('/:id/')
   async deleteTask(@Ctx() ctx: any, @Param('id') id: string) {
     const { userId } = ctx
     const result = await this.taskService.deleteById(userId, +id.slice(1))
+    return {
+      msg: "删除任务成功",
+      data: true
+    }
+  }
+
+  @Delete('/test/:id/')
+  async deleteTaskTest(@Ctx() ctx: any, @Param('id') id: string) {
+    const { userId } = ctx
+    // const result = await this.taskService.deleteById(userId, +id.slice(1))
     return {
       msg: "删除任务成功",
       data: true
@@ -70,6 +84,10 @@ export class TaskController {
     if (urgency) {
       task.urgency = +urgency
     }
-    return await this.taskService.editTask(task, +id.slice(1))
+    const result = await this.taskService.editTask(task, +id.slice(1))
+    return {
+      msg: "更新信息成功",
+      data: result
+    }
   }
 }

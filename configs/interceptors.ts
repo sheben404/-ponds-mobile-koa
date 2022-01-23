@@ -1,4 +1,4 @@
-import { InterceptorInterface, Action, Interceptor } from 'routing-controllers'
+import { Action, Interceptor, InterceptorInterface } from 'routing-controllers'
 import { Service } from 'typedi'
 
 @Interceptor()
@@ -6,7 +6,8 @@ import { Service } from 'typedi'
 export class AutoAssignJSONInterceptor implements InterceptorInterface {
   intercept(action: Action, content: any): any {
     if (typeof content === 'object')
-      return JSON.stringify(Object.assign(content))
-    return JSON.stringify({ message: content })
+      // console.log(content)
+      return JSON.stringify(Object.assign(content, { code: 200 }))
+    // return JSON.stringify({ message: content })
   }
 }

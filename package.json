@@ -7,7 +7,7 @@
     "dev": "set NODE_ENV=development && ts-node-dev -r tsconfig-paths/register app.ts",
     "dev:db": "docker compose -f docker-compose.yml up -d",
     "prettier": "prettier --write '**/*.{js,ts}'",
-    "test": "jest --config .jest.config.js --no-cache --detectOpenHandles",
+    "test": "jest --config .jest.config.js --no-cache --detectOpenHandles --coverage",
     "prod:build": "node ./build.js",
     "prod:start": "prisma generate && prisma migrate deploy && export NODE_ENV=production; node ./dist/index.js",
     "generate": "pnpx prisma generate",

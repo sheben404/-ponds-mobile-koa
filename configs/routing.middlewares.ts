@@ -8,7 +8,8 @@ export class HeaderMiddleware implements KoaMiddlewareInterface {
     context.set('Access-Control-Allow-Methods', 'GET,HEAD,PUT,POST,DELETE,PATCH')
     context.set(
       'Access-Control-Allow-Origin',
-      context.request.header.origin || context.request.origin,
+      // context.request.header.origin || context.request.origin,
+      '*',
     )
     context.set('Access-Control-Allow-Headers', ['content-type'])
     context.set('Access-Control-Allow-Credentials', 'true')
@@ -24,7 +25,7 @@ export class ErrorHandlerMiddleware implements KoaMiddlewareInterface {
     return next().catch(err => {
       const ret = {
         code: err.httpCode,
-        message: err.message
+        message: err.message,
       }
       ctx.res.end(JSON.stringify(ret))
     })

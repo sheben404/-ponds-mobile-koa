@@ -6,11 +6,23 @@ let username = 'testusername'
 let nickname = 'testnickname'
 let password = 'testpassword'
 let phone = '12345678910'
+let smsCode = '1234'
 
 describe('routers: user', () => {
   let app
   beforeAll(async () => {
     app = await server
+  })
+
+  it('should be return 400 status code', async () => {
+    const res = await request(app).post('/api/user/register').send({
+      username,
+      password,
+      phone,
+      nickname,
+    })
+    const parseResText = JSON.parse(res.text)
+    expect(parseResText.code).toEqual(400)
   })
 
   it('should be return 200 status code', async () => {
@@ -19,10 +31,28 @@ describe('routers: user', () => {
       password,
       phone,
       nickname,
+      smsCode,
     })
     const parseResText = JSON.parse(res.text)
     token = parseResText.data.token
     expect(parseResText.code).toEqual(200)
+  })
+
+  it('should be return 400 status code', async () => {
+    const res = await request(app).post('/api/user/login').send({
+      username,
+    })
+    const parseResText = JSON.parse(res.text)
+    expect(parseResText.code).toEqual(400)
+  })
+
+  it('should be return 400 status code', async () => {
+    const res = await request(app).post('/api/user/login').send({
+      username,
+      password: username,
+    })
+    const parseResText = JSON.parse(res.text)
+    expect(parseResText.code).toEqual(400)
   })
 
   it('should be return 200 status code', async () => {

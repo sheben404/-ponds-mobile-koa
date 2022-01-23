@@ -13,6 +13,7 @@ import { Prisma } from '@prisma/client'
 import { Service } from 'typedi'
 import { genToken } from '../helpers/jwt'
 import { AuthHeaderMiddleware } from '../helpers/authHeader'
+import genPassword from '../helpers/crypto'
 
 @JsonController('/user')
 @Service()
@@ -32,7 +33,7 @@ export class UserController {
       phone,
       username,
       nickname,
-      password,
+      password: genPassword(password),
     })
     if (registerRes) {
       const token = genToken({ userId: registerRes.id })
@@ -53,7 +54,7 @@ export class UserController {
     })
     const loginRes = await this.userService.login({
       username,
-      password,
+      password: genPassword(password),
     })
     if (loginRes) {
       const token = genToken({ userId: loginRes.id })

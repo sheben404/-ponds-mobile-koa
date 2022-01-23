@@ -2,6 +2,7 @@ import { bootstrapBefore } from '../bootstrap'
 import development, { EevRecord } from './development'
 import staging from './staging'
 import production from './production'
+import test from './test'
 import { ENVS } from './envs'
 
 const parsedEnvs = bootstrapBefore()
@@ -14,6 +15,7 @@ const getCurrentEnv = (): ENVS => {
   const upperCaseEnv = `${env}`.toUpperCase()
   if (upperCaseEnv === ENVS.PRODUCTION) return ENVS.PRODUCTION
   if (upperCaseEnv === ENVS.STAGING) return ENVS.STAGING
+  if (upperCaseEnv === ENVS.TEST) return ENVS.TEST
   return ENVS.DEVELOPMENT
 }
 
@@ -24,6 +26,8 @@ const getCurrentConstants = (ident: ENVS): EevRecord => {
       ? production
       : ident === ENVS.STAGING
       ? staging
+      : ident === ENVS.TEST
+      ? test
       : development
   Object.keys(development).forEach(key => {
     const sourceValue = source[key]

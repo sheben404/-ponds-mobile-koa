@@ -18,9 +18,9 @@
     "node": ">= 14.x"
   },
   "lint-staged": {
-    "./src/**/*.{ts,js,jsx,tsx}": [
-      "pnpm lint --fix",
-      "pnpm format"
+    "./**/*.{ts,js,jsx,tsx}": [
+      "prettier --write",
+      "eslint --fix"
     ]
   },
   "prettier": "@geist-ui/prettier-config",

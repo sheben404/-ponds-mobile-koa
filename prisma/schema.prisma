@@ -34,17 +34,17 @@ model Task {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   // History   History[]
-  // sort        Int
+  sort        Int
 }
 
 model History {
-  id          Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   // user        User      @relation(fields: [userId], references: [id])
   // task        Task      @relation(fields: [taskId], references: [id])
-  userId      Int
-  taskId      Int
-  toPont      Int
-  fromPont    Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  userId    Int
+  taskId    Int
+  toPont    Int
+  fromPont  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

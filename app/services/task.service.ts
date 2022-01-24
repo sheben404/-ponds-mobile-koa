@@ -4,27 +4,36 @@ import prisma from '../helpers/client'
 
 @Service()
 export class TaskService {
+  static taskSelect: Prisma.TaskSelect = {
+    id: true,
+    title: true,
+    description: true,
+    startDate: true,
+    endDate: true,
+    pond: true,
+    importance: true,
+    urgency: true,
+    sort: true,
+  }
   async findById(userId) {
-    const taskSelect: Prisma.TaskSelect = {
-      id: true,
-      title: true,
-      description: true,
-      startDate: true,
-      endDate: true,
-      pond: true,
-      importance: true,
-      urgency: true,
-    }
     return prisma.task.findMany({
       where: {
         userId
       },
-      select: taskSelect
+      select: TaskService.taskSelect
     })
   }
   async create(task: Prisma.TaskCreateInput) {
+    const count = await prisma.task.count({
+      where: {
+        userId: task.userId,
+      }
+    })
     return prisma.task.create({
-      data: task,
+      data: {
+        ...task,
+        sort: count + 1
+      },
     })
   }
   async deleteById(userId: number, taskId: number) {
@@ -35,23 +44,13 @@ export class TaskService {
       }
     })
   }
-  async editTask(data, taskId: number) {
-    const taskSelect: Prisma.TaskSelect = {
-      id: true,
-      title: true,
-      description: true,
-      startDate: true,
-      endDate: true,
-      pond: true,
-      importance: true,
-      urgency: true,
-    }
+  async editTask(data: Prisma.TaskUpdateInput, taskId: number) {
     return prisma.task.update({
       data,
       where: {
         id: taskId
       },
-      select: taskSelect
+      select: TaskService.taskSelect
     })
   }
 }

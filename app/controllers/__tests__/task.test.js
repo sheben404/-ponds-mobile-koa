@@ -97,7 +97,7 @@ describe('routers: task', () => {
 
   it('should be return 200 status code', async () => {
     const res = await request(app)
-      .put('/api/task/:5')
+      .put('/api/task/:1')
       .set({
         Authorization: `Bearer ${token}`,
       })

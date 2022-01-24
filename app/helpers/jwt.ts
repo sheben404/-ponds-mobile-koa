@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken'
 
 const SECRET_KEY = 'pondsTokenSecretKey'
-const EXPIRS_TIME = 60 * 60 * 24 // 24h
+const ACCESS_TOKEN_EXPIRS_TIME = 60 * 60 * 24 // 24h
+const REFRESH_TOKEN_EXPIRS_TIME = 60 * 60 * 24 * 15 // 24h * 15
 
 interface TokenData {
   userId: number
@@ -11,8 +12,12 @@ interface DecodeToken {
   data: TokenData
 }
 
-export const genToken = (data: TokenData) => {
-  return jwt.sign({ data }, SECRET_KEY, { expiresIn: EXPIRS_TIME })
+export const genAccessToken = (data: TokenData) => {
+  return jwt.sign({ data }, SECRET_KEY, { expiresIn: ACCESS_TOKEN_EXPIRS_TIME })
+}
+
+export const genRefreshToken = (data: TokenData) => {
+  return jwt.sign({ data }, SECRET_KEY, { expiresIn: REFRESH_TOKEN_EXPIRS_TIME })
 }
 
 export const decodeToken: (Authorization) => DecodeToken = Authorization => {

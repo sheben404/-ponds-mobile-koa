@@ -40,14 +40,21 @@ describe('routers: user', () => {
     expect(parseResText.code).toEqual(401)
   })
 
+  it('should be return 401 status code', async () => {
+    const res = await request(app).post('/api/token/refresh').send({
+      refresh_token: 'fake_refresh_token',
+    })
+    const parseResText = JSON.parse(res.text)
+    expect(parseResText.code).toEqual(401)
+  })
+
   it('should be return 200 status code', async () => {
-    const res = await request(app)
-      .get('/api/token')
-      .set({
-        Authorization: `Bearer ${refresh_token}`,
-      })
+    const res = await request(app).post('/api/token/refresh').send({
+      refresh_token,
+    })
     const parseResText = JSON.parse(res.text)
     access_token = parseResText.data.access_token
+    refresh_token = parseResText.data.refresh_token
     expect(res.status).toEqual(200)
   })
 

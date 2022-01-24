@@ -1,32 +1,24 @@
-import {
-  BadRequestError,
-  Post,
-  JsonController,
-  Get,
-  Put,
-  Body,
-  UseBefore,
-  Ctx,
-} from 'routing-controllers'
-import { UserService } from '../services'
-import { Prisma } from '@prisma/client'
+import { Post, JsonController, BodyParam, UnauthorizedError } from 'routing-controllers'
 import { Service } from 'typedi'
-import { genAccessToken, genRefreshToken } from '../helpers/jwt'
-import { AuthHeaderMiddleware } from '../helpers/authHeader'
+import { genAccessToken, genRefreshToken, verifyToken } from '../helpers/jwt'
 
 @JsonController('/token')
 @Service()
 export class TokenController {
-  constructor(private userService: UserService) {}
-  // 测试使用
-  @UseBefore(AuthHeaderMiddleware)
-  @Get()
-  async getToken(@Ctx() ctx: any) {
-    const { userId } = ctx
+  constructor() {}
+  @Post('/refresh')
+  async refresh(@BodyParam('refresh_token') old_refresh_token: string) {
+    let userId
+    try {
+      userId = verifyToken(old_refresh_token).data.userId
+    } catch (error) {
+      throw new UnauthorizedError('Refresh_token expired.\n') //错误信息待优化
+    }
     const access_token = genAccessToken({ userId })
+    const refresh_token = genRefreshToken({ userId })
     return {
-      msg: '注册成功',
-      data: { access_token },
+      msg: 'refresh token success!',
+      data: { access_token, refresh_token },
     }
   }
 }

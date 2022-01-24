@@ -54,7 +54,7 @@ export class TaskController {
   @Delete('/:id/')
   async deleteTask(@Ctx() ctx: any, @Param('id') id: string) {
     const { userId } = ctx
-    const result = await this.taskService.deleteById(userId, +id.slice(1))
+    const result = await this.taskService.deleteById(userId, +id)
     return {
       msg: "删除任务成功",
       data: true
@@ -84,7 +84,7 @@ export class TaskController {
     if (urgency) {
       task.urgency = +urgency
     }
-    const result = await this.taskService.editTask(task, +id.slice(1))
+    const result = await this.taskService.editTask(task, +id)
     return {
       msg: "更新信息成功",
       data: result

@@ -2,15 +2,29 @@ import server from 'server'
 import request from 'supertest'
 
 let token
-let username = 'ghgws'
-let nickname = 'wu'
-let password = '123456'
-let phone = '18075924185'
+let username = 'testtaskusername'
+let nickname = 'testtasknickname'
+let password = 'testtaskpassword'
+let phone = '18105687326'
+let smsCode = '1234'
 
 describe('routers: task', () => {
   let app
   beforeAll(async () => {
     app = await server
+  })
+
+  it('should be return 200 status code', async () => {
+    const res = await request(app).post('/api/user/register').send({
+      username,
+      password,
+      phone,
+      nickname,
+      smsCode,
+    })
+    const parseResText = JSON.parse(res.text)
+    token = parseResText.data.token
+    expect(parseResText.code).toEqual(200)
   })
 
   it('should be return 200 status code', async () => {
@@ -97,7 +111,7 @@ describe('routers: task', () => {
 
   it('should be return 200 status code', async () => {
     const res = await request(app)
-      .put('/api/task/:1')
+      .put('/api/task/1')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -112,7 +126,7 @@ describe('routers: task', () => {
 
   it('should be return 200 status code', async () => {
     const res = await request(app)
-      .delete('/api/task/test/:1')
+      .delete('/api/task/test/1')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -123,6 +137,16 @@ describe('routers: task', () => {
       })
       const parseResText = JSON.parse(res.text)
       expect(parseResText.code).toEqual(200)
+  })
+
+  // 删除注册的账号，防止下次测试注册出错
+  it('should be return 200 status code', async () => {
+    const res = await request(app)
+      .post('/api/user/test/delete')
+      .set({
+        Authorization: `Bearer ${token}`,
+      })
+    expect(res.status).toEqual(200)
   })
 
   afterAll(async done => {

@@ -23,7 +23,7 @@ describe('routers: task', () => {
       smsCode,
     })
     const parseResText = JSON.parse(res.text)
-    token = parseResText.data.token
+    token = parseResText.data.access_token
     expect(parseResText.code).toEqual(200)
   })
 
@@ -33,7 +33,7 @@ describe('routers: task', () => {
       password,
     })
     const parseResText = JSON.parse(res.text)
-    token = parseResText.data.token
+    token = parseResText.data.access_token
     expect(parseResText.code).toEqual(200)
   })
 
@@ -45,9 +45,11 @@ describe('routers: task', () => {
   })
 
   it('should be return 401 status code', async () => {
-    const res = await request(app).get('/api/task').set({
-      Authorization: `Beaer ${token}`,
-    })
+    const res = await request(app)
+      .get('/api/task')
+      .set({
+        Authorization: `Beaer ${token}`,
+      })
     const parseResText = JSON.parse(res.text)
     expect(parseResText.code).toEqual(401)
   })
@@ -75,9 +77,8 @@ describe('routers: task', () => {
         Authorization: `Bearer ${token}`,
       })
       .send({
-        title: "test: create a task",
+        title: 'test: create a task',
         pond: 2,
-
       })
     const parseResText = JSON.parse(res.text)
     expect(parseResText.code).toEqual(200)
@@ -103,7 +104,7 @@ describe('routers: task', () => {
         Authorization: `Bearer ${token}`,
       })
       .send({
-        title: "test: create a task", // 缺少pond
+        title: 'test: create a task', // 缺少pond
       })
     const parseResText = JSON.parse(res.text)
     expect(parseResText.code).toEqual(400)
@@ -116,7 +117,7 @@ describe('routers: task', () => {
         Authorization: `Bearer ${token}`,
       })
       .send({
-        title: "test: edit a task",
+        title: 'test: edit a task',
         importance: 2,
         urgency: 3,
       })
@@ -131,12 +132,21 @@ describe('routers: task', () => {
         Authorization: `Bearer ${token}`,
       })
       .send({
-        title: "test: edit a task",
+        title: 'test: edit a task',
         importance: 2,
         urgency: 3,
       })
-      const parseResText = JSON.parse(res.text)
-      expect(parseResText.code).toEqual(200)
+    const parseResText = JSON.parse(res.text)
+    expect(parseResText.code).toEqual(200)
+  })
+
+  it('should be return 200 status code', async () => {
+    const res = await request(app)
+      .post('/api/user/test/delete')
+      .set({
+        Authorization: `Bearer ${token}`,
+      })
+    expect(res.status).toEqual(200)
   })
 
   // 删除注册的账号，防止下次测试注册出错

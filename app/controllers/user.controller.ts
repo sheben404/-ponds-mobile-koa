@@ -11,7 +11,7 @@ import {
 import { UserService } from '../services'
 import { Prisma } from '@prisma/client'
 import { Service } from 'typedi'
-import { genToken } from '../helpers/jwt'
+import { genAccessToken, genRefreshToken } from '../helpers/jwt'
 import { AuthHeaderMiddleware } from '../helpers/authHeader'
 import genPassword from '../helpers/crypto'
 
@@ -20,6 +20,7 @@ import genPassword from '../helpers/crypto'
 export class UserController {
   constructor(private userService: UserService) {}
 
+  // TODO 注册参数使用 class-validator 校验
   @Post('/register')
   async register(@Body() registerParmObj: Prisma.UserCreateInput & { smsCode: String }) {
     const { phone, username, nickname, password, smsCode } = registerParmObj
@@ -36,8 +37,12 @@ export class UserController {
       password: genPassword(password),
     })
     if (registerRes) {
-      const token = genToken({ userId: registerRes.id })
-      return { msg: '注册成功', data: Object.assign(registerRes, { token: token }) }
+      const access_token = genAccessToken({ userId: registerRes.id })
+      const refresh_token = genRefreshToken({ userId: registerRes.id })
+      return {
+        msg: '注册成功',
+        data: Object.assign(registerRes, { access_token, refresh_token }),
+      }
     } else {
       throw new BadRequestError('注册失败')
     }
@@ -57,8 +62,12 @@ export class UserController {
       password: genPassword(password),
     })
     if (loginRes) {
-      const token = genToken({ userId: loginRes.id })
-      return { msg: '登录成功', data: Object.assign(loginRes, { token: token }) }
+      const access_token = genAccessToken({ userId: loginRes.id })
+      const refresh_token = genRefreshToken({ userId: loginRes.id })
+      return {
+        msg: '登录成功',
+        data: Object.assign(loginRes, { access_token, refresh_token }),
+      }
     } else {
       throw new BadRequestError('用户名密码不匹配')
     }

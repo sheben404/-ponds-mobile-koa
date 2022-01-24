@@ -34,7 +34,7 @@ describe('routers: user', () => {
       smsCode,
     })
     const parseResText = JSON.parse(res.text)
-    token = parseResText.data.token
+    token = parseResText.data.access_token
     expect(parseResText.code).toEqual(200)
   })
 
@@ -61,7 +61,7 @@ describe('routers: user', () => {
       password,
     })
     const parseResText = JSON.parse(res.text)
-    token = parseResText.data.token
+    token = parseResText.data.access_token
     expect(parseResText.code).toEqual(200)
   })
 

@@ -1,6 +1,6 @@
-import { Service } from 'typedi'
-import prisma from 'app/helpers/client'
 import { Prisma } from '@prisma/client'
+import prisma from 'app/helpers/client'
+import { Service } from 'typedi'
 
 @Service()
 export class UserService {
@@ -20,7 +20,7 @@ export class UserService {
     phone: true,
     createdAt: true,
   }
-  
+
   async register(userInfo: Prisma.UserCreateInput) {
     return prisma.user.create({
       data: userInfo,

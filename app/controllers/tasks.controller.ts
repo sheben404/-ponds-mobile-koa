@@ -52,9 +52,9 @@ export class TaskController {
   }
 
   @Delete('/:id/')
-  async deleteTask(@Ctx() ctx: any, @Param('id') id: string) {
+  async deleteTask(@Ctx() ctx: any, @Param('id') id: number) {
     const { userId } = ctx
-    const result = await this.taskService.deleteById(userId, +id)
+    this.taskService.deleteById(userId, +id)
     return {
       msg: "删除任务成功",
       data: true
@@ -72,7 +72,7 @@ export class TaskController {
   }
 
   @Put('/:id/')
-  async editTask(@Body() task: Prisma.TaskCreateInput, @Param('id') id: string) {
+  async editTask(@Body() task: Prisma.TaskCreateInput, @Param('id') id: number) {
     // const { userId } = ctx
     const { pond, urgency, importance } = task
     if (pond) {
@@ -84,10 +84,27 @@ export class TaskController {
     if (urgency) {
       task.urgency = +urgency
     }
-    const result = await this.taskService.editTask(task, +id)
+    const result = await this.taskService.editTask(task, id)
     return {
       msg: "更新信息成功",
       data: result
+    }
+  }
+
+  @Post('/reorder')
+  async reorder(@Body() orderInfo, @Ctx() ctx: any) {
+    const { userId } = ctx
+    const result = await this.taskService.reorderTask(orderInfo, userId)
+    if (result && result.count > 0) {
+      return {
+        msg: "排序成功",
+        data: true
+      }
+    } else {
+      return {
+        msg: "排序失败",
+        data: false
+      }
     }
   }
 }

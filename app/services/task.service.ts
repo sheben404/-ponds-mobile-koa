@@ -32,17 +32,31 @@ export class TaskService {
     return prisma.task.create({
       data: {
         ...task,
-        sort: count + 1
+        sort: count
       },
     })
   }
   async deleteById(userId: number, taskId: number) {
-    return prisma.task.deleteMany({
+    const res = await prisma.task.delete({
       where: {
-        userId,
         id: taskId
       }
     })
+    // 大于删除元素的sort -1
+    await prisma.task.updateMany({
+      where: {
+        userId,
+        sort: {
+          gt: res.sort
+        }
+      },
+      data: {
+        sort: {
+          decrement: 1
+        }
+      }
+    })
+    return res
   }
   async editTask(data: Prisma.TaskUpdateInput, taskId: number) {
     return prisma.task.update({
@@ -52,5 +66,75 @@ export class TaskService {
       },
       select: TaskService.taskSelect
     })
+  }
+
+  async reorderTask(data: any, userId: number) {
+    const { fromId, fromPondId, referenceId, toPondId, offset } = data
+    // 池子类型切换
+    if (fromPondId !== toPondId) {
+      await prisma.task.update({
+        data: {
+          pond: toPondId,
+        },
+        where: {
+          id: fromId
+        }
+      })
+    }
+
+    const from = await prisma.task.findUnique({
+      where: {
+        id: fromId
+      }
+    })
+    const reference = await prisma.task.findUnique({
+      where: {
+        id: referenceId
+      }
+    })
+
+    const fromSort = from.sort
+    const referenceSort = reference.sort
+    // 修改移动的元素
+    await prisma.task.update({
+      data: {
+        sort: fromSort + offset
+      },
+      where: {
+        id: fromId
+      }
+    })
+    // 修改偏移量范围内的元素
+    if (offset > 0) {
+      return await prisma.task.updateMany({
+        where: {
+            userId,
+            sort: {
+              lte: referenceSort,
+              gt: fromSort
+            }
+        },
+        data: {
+          sort: {
+            decrement: 1
+          }
+        }
+      })
+    } else {
+      return await prisma.task.updateMany({
+        where: {
+          userId,
+          sort: {
+            lt: fromSort,
+            gte: referenceSort
+          }
+        },
+        data: {
+          sort: {
+            increment: 1
+          }
+        }
+      })
+    }
   }
 }

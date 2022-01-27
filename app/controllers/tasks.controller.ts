@@ -95,7 +95,7 @@ export class TaskController {
   async reorder(@Body() orderInfo, @Ctx() ctx: any) {
     const { userId } = ctx
     const result = await this.taskService.reorderTask(orderInfo, userId)
-    if (result && result.count > 0) {
+    if (result) {
       return {
         msg: "排序成功",
         data: true

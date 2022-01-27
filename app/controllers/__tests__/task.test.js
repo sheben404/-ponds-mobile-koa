@@ -124,51 +124,9 @@ describe('routers: task', () => {
     const parseResText = JSON.parse(res.text)
     expect(parseResText.code).toEqual(200)
   })
-  // 测试拖拽排序接口
-  // 再创建两个task
-  it('should be a prepare for the test of sort', async () => {
-    const res = await request(app)
-      .post('/api/task')
-      .set({
-        Authorization: `Bearer ${token}`,
-      })
-      .send({
-        title: 'test: prepare for sort',
-        pond: 3,
-      })
-    const parseResText = JSON.parse(res.text)
-    expect(parseResText.code).toEqual(200)
-  })
-  it('should be a prepare for the test of sort', async () => {
-    const res = await request(app)
-      .post('/api/task')
-      .set({
-        Authorization: `Bearer ${token}`,
-      })
-      .send({
-        title: 'test: the 2nd task prepare for sort',
-        pond: 2,
-      })
-    const parseResText = JSON.parse(res.text)
-    expect(parseResText.code).toEqual(200)
-  })
-  // 开始测试排序接口
-  it('should be return 200 status code', async () => {
-    const res = await request(app)
-      .post('/api/task/reorder')
-      .set({
-        Authorization: `Bearer ${token}`,
-      })
-      .send({
-        fromId: 1,
-        fromPondId: 3,
-        referenceId: 2,
-        toPondId: 2,
-        offset: -1
-      })
-    const parseResText = JSON.parse(res.text)
-    expect(parseResText.code).toEqual(200)
-  })
+// Todo: 测试排序接口
+
+
   // 删除接口
   it('should be return 200 status code', async () => {
     const res = await request(app)

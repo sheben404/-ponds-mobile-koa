@@ -32,17 +32,31 @@ export class TaskService {
     return prisma.task.create({
       data: {
         ...task,
-        sort: count + 1
+        sort: count
       },
     })
   }
   async deleteById(userId: number, taskId: number) {
-    return prisma.task.deleteMany({
+    const res = await prisma.task.delete({
       where: {
-        userId,
         id: taskId
       }
     })
+    // 大于删除元素的sort -1
+    await prisma.task.updateMany({
+      where: {
+        userId,
+        sort: {
+          gt: res.sort
+        }
+      },
+      data: {
+        sort: {
+          decrement: 1
+        }
+      }
+    })
+    return res
   }
   async editTask(data: Prisma.TaskUpdateInput, taskId: number) {
     return prisma.task.update({
@@ -52,5 +66,124 @@ export class TaskService {
       },
       select: TaskService.taskSelect
     })
+  }
+
+  async reorderTask(data: any, userId: number) {
+    const { fromSort, fromId, fromPondId, referenceSort, toPondId, type } = data
+    // 池子类型切换
+    if (fromPondId !== toPondId) {
+      await prisma.task.update({
+        data: {
+          pond: +toPondId,
+        },
+        where: {
+          id: +fromId
+        }
+      })
+    }
+
+    if (type === 'after') {
+      if (fromSort < referenceSort) {
+        const sort1 = await prisma.task.updateMany({
+          where: {
+              userId,
+              sort: {
+                lte: +referenceSort,
+                gte: +fromSort + 1
+              }
+          },
+          data: {
+            sort: {
+              decrement: 1
+            }
+          }
+        })
+        const sort2 = await prisma.task.update({
+          data: {
+            sort: +referenceSort
+          },
+          where: {
+            id: +fromId
+          }
+        })
+        return sort1 && sort2
+      } else {
+        const sort1 = await prisma.task.updateMany({
+          where: {
+              userId,
+              sort: {
+                lte: +fromSort - 1,
+                gte: +referenceSort + 1
+              }
+          },
+          data: {
+            sort: {
+              increment: 1
+            }
+          }
+        })
+        const sort2 = await prisma.task.update({
+          data: {
+            sort: +referenceSort + 1
+          },
+          where: {
+            id: +fromId
+          }
+        })
+        return sort1 && sort2
+      }
+    } else if (type === 'before') {
+      if (fromSort < referenceSort) {
+        const sort1 = await prisma.task.updateMany({
+          where: {
+              userId,
+              sort: {
+                lte: +referenceSort - 1,
+                gte: +fromSort + 1
+              }
+          },
+          data: {
+            sort: {
+              decrement: 1
+            }
+          }
+        })
+        const sort2 = await prisma.task.update({
+          data: {
+            sort: +referenceSort - 1
+          },
+          where: {
+            id: +fromId
+          }
+        })
+        return sort1 && sort2
+
+      } else {
+        const sort1 = await prisma.task.updateMany({
+          where: {
+              userId,
+              sort: {
+                lte: +fromSort - 1,
+                gte: +referenceSort
+              }
+          },
+          data: {
+            sort: {
+              increment: 1
+            }
+          }
+        })
+        const sort2 = await prisma.task.update({
+          data: {
+            sort: +referenceSort
+          },
+          where: {
+            id: +fromId
+          }
+        })
+        return sort1 && sort2
+
+      }
+    }
   }
 }

@@ -2,10 +2,10 @@ import server from 'server'
 import request from 'supertest'
 
 let token
-let username = 'ghgws'
-let nickname = 'wu'
-let password = '123456'
-let phone = '18075924185'
+let username = 'testtaskusername'
+let nickname = 'testtasknickname'
+let password = 'testtaskpassword'
+let phone = '18105687326'
 let smsCode = '1234'
 
 describe('routers: task', () => {
@@ -112,7 +112,7 @@ describe('routers: task', () => {
 
   it('should be return 200 status code', async () => {
     const res = await request(app)
-      .put('/api/task/:1')
+      .put('/api/task/1')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -124,10 +124,13 @@ describe('routers: task', () => {
     const parseResText = JSON.parse(res.text)
     expect(parseResText.code).toEqual(200)
   })
+// Todo: 测试排序接口
 
+
+  // 删除接口
   it('should be return 200 status code', async () => {
     const res = await request(app)
-      .delete('/api/task/test/:1')
+      .delete('/api/task/test/1')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -140,6 +143,7 @@ describe('routers: task', () => {
     expect(parseResText.code).toEqual(200)
   })
 
+  // 删除注册的账号，防止下次测试注册出错
   it('should be return 200 status code', async () => {
     const res = await request(app)
       .post('/api/user/test/delete')

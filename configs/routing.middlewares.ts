@@ -27,6 +27,7 @@ export class ErrorHandlerMiddleware implements KoaMiddlewareInterface {
         code: err.httpCode,
         message: err.message,
       }
+      ctx.response.status = 200 //伪装为请求都成功，前端通过data的code判断实际请求status
       ctx.res.end(JSON.stringify(ret))
     })
   }
